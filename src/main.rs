@@ -1,5 +1,7 @@
-use quadedge_rs::add;
+use quadedge_rs::Manifold;
 
 fn main() {
-    println!("2 + 3 = {}", add(2, 3));
+    let manifold: Manifold<()> = Manifold::new();
+    let q = manifold.make_quad();
+    println!("{:?}", q);
 }

@@ -65,11 +65,11 @@ impl<'m, V: Default + Copy, F: Default + Copy> Manifold<'m, V, F> {
             panic!("Incompatible edge types!")
         }
 
-        let (c, i) = a.0.onext(a.1);
-        let _alpha = c.rot(i);
+        let (qtmp, itmp) = a.0.onext(a.1);
+        let _alpha = qtmp.rot(itmp);
 
-        let (d, j) = b.0.onext(b.1);
-        let _beta = d.rot(j);
+        let (qtmp, itmp) = b.0.onext(b.1);
+        let _beta = qtmp.rot(itmp);
     }
 }
 

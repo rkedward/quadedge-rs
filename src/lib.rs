@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 use std::cell::Cell;
+use std::fmt;
 use typed_arena::Arena;
 
 type EdgeRef<'m, V, F> = (&'m QuadEdge<'m, V, F>, u8);
@@ -7,17 +8,21 @@ type EdgeRefCell<'m, V, F> = Cell<Option<EdgeRef<'m, V, F>>>;
 type VertCell<'m, V> = Cell<Option<&'m V>>;
 type FaceCell<'m, F> = Cell<Option<&'m F>>;
 
-
-#[derive(Default, Debug)]
+#[derive(Default)]
 pub struct QuadEdge<'m, V, F> {
     next: [EdgeRefCell<'m, V, F>; 4],
-    data: (VertCell<'m, V>, FaceCell<'m, F>, VertCell<'m, V>, FaceCell<'m, F>),
+    data: (
+        VertCell<'m, V>,
+        FaceCell<'m, F>,
+        VertCell<'m, V>,
+        FaceCell<'m, F>,
+    ),
 }
 
 impl<'m, V, F> QuadEdge<'m, V, F> {
     #[inline]
     fn onext(&'m self, r: u8) -> EdgeRef<'m, V, F> {
-        self.next[(r + 1).rem_euclid(4) as usize].get().unwrap()
+        self.next[r.rem_euclid(4) as usize].get().unwrap()
     }
 
     #[inline]
@@ -29,6 +34,12 @@ impl<'m, V, F> QuadEdge<'m, V, F> {
 impl<'m, V, F> PartialEq for QuadEdge<'m, V, F> {
     fn eq(&self, other: &Self) -> bool {
         std::ptr::eq(self, other)
+    }
+}
+
+impl<'m, V, F> fmt::Debug for QuadEdge<'m, V, F> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "QuadEdge({:p})", self)
     }
 }
 
@@ -57,10 +68,8 @@ impl<'m, V: Default + Copy, F: Default + Copy> Manifold<'m, V, F> {
         let (c, i) = a.0.onext(a.1);
         let _alpha = c.rot(i);
 
-        let (d, i) = b.0.onext(b.1);
-        let _beta = d.rot(i);
-
-
+        let (d, j) = b.0.onext(b.1);
+        let _beta = d.rot(j);
     }
 }
 
